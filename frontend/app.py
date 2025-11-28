@@ -2,7 +2,10 @@ import streamlit as st
 import requests
 
 #后端地址
-BACKEND_URL = "http://127.0.0.1:8000"
+try:
+    BACKEND_URL = st.secrets["BACKEND_URL"]
+except:
+    BACKEND_URL = "http://127.0.0.1:8000"
 
 st.set_page_config(page_title="AI 导购 (客户端)", layout="wide")
 st.title("🛍️ 你的专属 AI 导购")
