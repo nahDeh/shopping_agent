@@ -19,6 +19,7 @@ def search_shopping(query, api_key):
 
     try:
         response =  requests.request("POST", url, headers=headers, data=pyload)
+        print(response.json()) 
         return response.json()
     except Exception as e:
         print(f"搜索失败:{e}")
