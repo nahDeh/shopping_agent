@@ -1,0 +1,33 @@
+name: Sync to Hugging Face Hub
+
+on:
+  push:
+    branches: [main]  # 当 main 分支有代码推送时触发
+
+  # 允许手动触发
+  workflow_dispatch:
+
+jobs:
+  sync-to-hub:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          lfs: true # 如果你有大文件，开启 LFS
+
+      - name: Push to hub
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }} # 读取你刚才存的 Token
+        run: |
+          # 配置 git 信息
+          git config --global user.email "1963545803@qq.com"
+          git config --global user.name "nahdeh"
+          
+          # 添加 Hugging Face 远程仓库
+          # 注意：把下面的 URL 换成你自己的 Hugging Face Space 地址
+          # 格式是: https://用户名:$HF_TOKEN@huggingface.co/spaces/用户名/Space名
+          git remote add hf https://nahdeh:$HF_TOKEN@huggingface.co/spaces/nahdeh/my-shopping-backend
+          
+          # 强行推送到 Hugging Face
+          git push --force hf main

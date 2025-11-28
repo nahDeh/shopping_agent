@@ -15,6 +15,8 @@ COPY . .
 
 # 创建一个非 root 用户 (Hugging Face 的安全要求)
 RUN useradd -m -u 1000 user
+RUN chown -R user:user /app
+
 USER user
 ENV HOME=/home/user \
     PATH=/home/user/.local/bin:$PATH
