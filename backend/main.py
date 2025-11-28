@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import List, Optional, Dict
 import uvicorn
 import os
+from fastapi.middleware.cors import CORSMiddleware
 from core.agent import observer_agent, generate_search_agentkey, generate_advice
 from core.search import search_shopping
 from core.memory import load_profile, save_profile
