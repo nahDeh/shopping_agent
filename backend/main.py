@@ -13,7 +13,7 @@ from langchain_openai import ChatOpenAI
 
 SILICON_API_KEY = os.getenv("SILICON_API_KEY")
 SERPER_API_KEY = os.getenv("SERPER_API_KEY")
-BASE_URL = os.getenv("BASEURL")
+BASE_URL = os.getenv("BASE_URL")
 MODEL_NAME = os.getenv("MODEL_NAME")
 if not SILICON_API_KEY:
     print("⚠️ 警告: 未检测到 SILICON_API_KEY，AI 功能将无法使用！")
@@ -96,3 +96,7 @@ async def get_profile(user_id: str):
 if __name__ == "__main__":
     # 启动服务器，端口 8000
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+@app.get("/")
+async def root():
+    return {"message": "Hello! The AI Shopping API is running."}
