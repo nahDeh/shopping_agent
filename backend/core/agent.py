@@ -1,27 +1,44 @@
 import json
 from langchain_core.prompts import ChatPromptTemplate
+from typing import Optional, Dict
+from langchain_core.output_parsers import PydanticOutputParser
+from pydantic import BaseModel, Field
+
+class ProfileUpdateResult(BaseModel):
+    #用于判断用户喜好是否需要更新
+    has_update: bool = Field(description="判断用户是否透露了新的偏好，需要更新画像则为 True，否则为 False")
+    #根据has_update的返回值来进行判断来进行更新
+    new_profile: Optional[dict] = Field(description="如果不更新，为 null；如果更新，输出融合后的完整画像 JSON 数据")
 
 #创建观察者AI, 负责分析用户画像, 更新画像
 def observer_agent(llm, user_input, current_profile):
+    parser = PydanticOutputParser(pydantic_object=ProfileUpdateResult)
+
     prompt = f"""
     你是一个敏锐的用户画像侧写师。
-    【当前画像】：{json.dumps(current_profile, ensure_ascii=False)}
+    【当前画像】：{current_profile}
     【用户新语】："{user_input}"
     
     判断用户是否透露了新的购物偏好（预算、品牌、风格等）。
-    - 无更新：输出 "NO_UPDATE"
-    - 有更新：输出更新后的完整 JSON。保留旧数据，融合新数据。
-    
-    只输出 JSON。
+    请严格按照下方的格式说明输出JSON。
+
+    {format_instruction}
     """
 
+    chain = prompt | llm | parser
+
     try:
-        response = llm.invoke(prompt).content
-        if "NO_UPDATE" in response:
+        result = chain.invoke({
+            "current_profile": json.dumps(current_profile, ensure_ascii=False),
+            "user_input" : user_input,
+            "format_instruction" : parser.get_format_instructions()
+        })
+
+        if result.has_update:
+            print(f"用户画像更新:{result.new_profile}")
+            return result.new_profile
+        else:
             return None
-        clean_json = response.replace("```json", "").replace("```", "").strip()
-        print(response)
-        return json.loads(clean_json)
     except Exception as e:
         return None
     
