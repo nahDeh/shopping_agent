@@ -14,7 +14,7 @@ class ProfileUpdateResult(BaseModel):
 def observer_agent(llm, user_input, current_profile):
     parser = PydanticOutputParser(pydantic_object=ProfileUpdateResult)
 
-    prompt = f"""
+    prompt = """
     你是一个敏锐的用户画像侧写师。
     【当前画像】：{current_profile}
     【用户新语】："{user_input}"
